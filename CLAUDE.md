@@ -8,7 +8,7 @@ When adding new libraries, always search for the latest version on PyPI first.
 
 ## Project Overview
 
-Video generation AI agent system for creating marketing/advertising videos. The system uses multi-agent workflows to orchestrate multiple video generation models (Sora, Veo, Kling) and produces high-quality videos up to 1 minute in length.
+Video generation AI agent system for creating marketing/advertising videos. The system uses multi-agent workflows to orchestrate multiple video generation models (Sora, Veo) and produces high-quality videos up to 1 minute in length.
 
 **Target Use Case:** Game marketing video ads (e.g., Cookie Run character transformation ads, viral marketing videos)
 
@@ -16,7 +16,7 @@ Video generation AI agent system for creating marketing/advertising videos. The 
 
 - **Backend/Agents:** Python 3.11+, OpenAI Agents SDK, uv (package manager)
 - **Frontend:** Next.js, React, Tailwind CSS, shadcn/ui
-- **Video Generation APIs:** Sora, Veo, Kling 2.5 Turbo
+- **Video Generation APIs:** Sora, Veo
 - **Image Generation/LLM:** GPT (OpenAI)
 
 ## Architecture
