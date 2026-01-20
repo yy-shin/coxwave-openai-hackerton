@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
+from pathlib import Path
 from typing import Any, AsyncIterator
 
 from agents import Runner
@@ -26,6 +27,8 @@ from chatkit.types import (
 )
 from openai.types.responses import ResponseInputContentParam
 
+from .attachment_store import LocalAttachmentStore
+from .attachments import attachment_to_message_content
 from .memory_store import MemoryStore
 from .thread_item_converter import BasicThreadItemConverter
 from .video_agent import VideoAgentContext, video_agent
@@ -40,7 +43,11 @@ class VideoAssistantServer(ChatKitServer[dict[str, Any]]):
 
     def __init__(self) -> None:
         self.store: MemoryStore = MemoryStore()
-        super().__init__(self.store)
+        self.attachment_store = LocalAttachmentStore(
+            self.store,
+            base_dir=Path(__file__).resolve().parents[2] / "data" / "attachments",
+        )
+        super().__init__(self.store, attachment_store=self.attachment_store)
 
         # Domain-specific store for video project state
         self.project_store = VideoProjectStore()
@@ -133,8 +140,7 @@ class VideoAssistantServer(ChatKitServer[dict[str, Any]]):
 
     async def to_message_content(self, _input: Attachment) -> ResponseInputContentParam:
         """Convert attachments to message content."""
-        # TODO: Support file attachments for reference videos/images
-        raise RuntimeError("File attachments are not yet supported.")
+        return attachment_to_message_content(_input)
 
     # --- Private action handlers ---
 

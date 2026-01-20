@@ -6,7 +6,17 @@ import logging
 from datetime import datetime
 from typing import Annotated, Any, Callable, List
 
-from agents import Agent, ModelSettings, RunContextWrapper, StopAtTools, function_tool
+from agents import (
+    Agent,
+    GuardrailFunctionOutput,
+    ModelSettings,
+    Runner,
+    RunContextWrapper,
+    StopAtTools,
+    TResponseInputItem,
+    function_tool,
+    input_guardrail,
+)
 from chatkit.agents import AgentContext
 from chatkit.types import (
     AssistantMessageContent,
@@ -84,6 +94,48 @@ high-quality marketing videos for games and products.
 - `create_storyboard`: Create and display storyboard with segments
 - `edit_storyboard_segment`: Edit a single segment by index (0-based) when user requests changes
 - `start_video_generation`: Start video generation after storyboard approval
+
+## Using Attached Images
+When users attach images, you will see them in the conversation with their file paths like:
+`[Attached file: image.png, path: /path/to/attachments/abc123_image.png]`
+
+**IMPORTANT**: When creating a storyboard, use attached images in your generation inputs:
+- Extract the `path` value from the attachment info (e.g., `/path/to/attachments/abc123_image.png`)
+- Analyze the attached images to understand characters, style, and visual elements
+- Reference these visual elements in your prompts for consistency
+
+**Image Usage Options:**
+1. `input_image_path` (image-to-video): Use when the video should START from this exact image
+   - The first frame will be the attached image, then animated
+   - Best for: animating a specific scene, character pose, or keyframe
+
+2. `reference_image_paths` (style/character reference): Use for visual guidance
+   - Model uses these to understand appearance/style but doesn't start from them
+   - Best for: maintaining character consistency, art style, color palette
+
+Example with attached image at `/data/attachments/abc_scene.png`:
+```json
+{
+  "generation_inputs": [{
+    "provider": "sora",
+    "prompt": "The scene comes alive as the character begins to move...",
+    "input_image_path": "/data/attachments/abc_scene.png",
+    "reference_image_paths": []
+  }]
+}
+```
+
+Example using image as reference only:
+```json
+{
+  "generation_inputs": [{
+    "provider": "sora",
+    "prompt": "A similar character walks through a forest...",
+    "input_image_path": null,
+    "reference_image_paths": ["/data/attachments/abc_character.png"]
+  }]
+}
+```
 
 ## Important Notes
 - Keep responses concise and professional

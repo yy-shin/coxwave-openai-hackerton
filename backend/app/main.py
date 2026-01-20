@@ -11,7 +11,9 @@ from pathlib import Path
 from typing import Any
 
 from chatkit.server import StreamingResult
+from chatkit.store import NotFoundError
 from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from starlette.responses import JSONResponse
 
@@ -28,6 +30,12 @@ from .video_project_state import VideoProjectState
 _PROJECT_ROOT = Path(__file__).parent.parent
 
 app = FastAPI(title="OvenAI Video Generation API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 _chatkit_server: VideoAssistantServer | None = create_chatkit_server()
 
@@ -73,6 +81,44 @@ async def read_project_state(
 async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "ok"}
+
+
+@app.put("/attachments/{attachment_id}/upload")
+async def upload_attachment(
+    attachment_id: str,
+    request: Request,
+    server: VideoAssistantServer = Depends(get_chatkit_server),
+) -> dict[str, str]:
+    """Upload attachment bytes for two-phase upload."""
+    data = await request.body()
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty upload body")
+    attachment_store = server._get_attachment_store()
+    try:
+        await attachment_store.save_upload(attachment_id, data, {"request": request})
+    except NotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {"status": "ok"}
+
+
+@app.get("/attachments/{attachment_id}")
+async def read_attachment(
+    attachment_id: str,
+    request: Request,
+    server: VideoAssistantServer = Depends(get_chatkit_server),
+) -> Response:
+    """Serve uploaded attachments for UI previews."""
+    try:
+        attachment = await server.store.load_attachment(
+            attachment_id, context={"request": request}
+        )
+    except NotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    path = (attachment.metadata or {}).get("path")
+    if not path:
+        raise HTTPException(status_code=404, detail="Attachment has no file path")
+    return FileResponse(path, media_type=attachment.mime_type, filename=attachment.name)
 
 
 @app.post("/generate")

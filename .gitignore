@@ -212,6 +212,7 @@ data/videos/*.mp4
 data/videos/*.webm
 data/videos/*.json
 data/images/*.png
+data/attachments/
 
 .claude/settings.local.json
 *.mp4

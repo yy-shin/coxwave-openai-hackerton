@@ -6,15 +6,24 @@ A production app would implement this using a persistent database.
 from __future__ import annotations
 
 from collections import defaultdict
+import json
+from pathlib import Path
 
 from chatkit.store import NotFoundError, Store
 from chatkit.types import Attachment, Page, ThreadItem, ThreadMetadata
+from pydantic import TypeAdapter
 
 
 class MemoryStore(Store[dict]):
     def __init__(self):
         self.threads: dict[str, ThreadMetadata] = {}
         self.items: dict[str, list[ThreadItem]] = defaultdict(list)
+        self.attachments: dict[str, Attachment] = {}
+        self._attachment_index_path = (
+            Path(__file__).resolve().parents[2] / "data" / "attachments" / "index.json"
+        )
+        self._attachment_index_path.parent.mkdir(parents=True, exist_ok=True)
+        self._load_attachments_from_disk()
 
     async def load_thread(self, thread_id: str, context: dict) -> ThreadMetadata:
         if thread_id not in self.threads:
@@ -84,10 +93,41 @@ class MemoryStore(Store[dict]):
     # Attachments are not implemented in this store
 
     async def save_attachment(self, attachment: Attachment, context: dict) -> None:
-        raise NotImplementedError()
+        self.attachments[attachment.id] = attachment
+        self._persist_attachments()
 
     async def load_attachment(self, attachment_id: str, context: dict) -> Attachment:
-        raise NotImplementedError()
+        attachment = self.attachments.get(attachment_id)
+        if attachment is None:
+            self._load_attachments_from_disk()
+            attachment = self.attachments.get(attachment_id)
+        if attachment is None:
+            raise NotFoundError(f"Attachment {attachment_id} not found")
+        return attachment
 
     async def delete_attachment(self, attachment_id: str, context: dict) -> None:
-        raise NotImplementedError()
+        self.attachments.pop(attachment_id, None)
+        self._persist_attachments()
+
+    def _load_attachments_from_disk(self) -> None:
+        if not self._attachment_index_path.exists():
+            return
+        try:
+            payload = json.loads(self._attachment_index_path.read_text())
+        except json.JSONDecodeError:
+            return
+        adapter = TypeAdapter(Attachment)
+        attachments: dict[str, Attachment] = {}
+        for attachment_id, data in payload.items():
+            try:
+                attachments[attachment_id] = adapter.validate_python(data)
+            except Exception:
+                continue
+        self.attachments = attachments
+
+    def _persist_attachments(self) -> None:
+        data = {
+            attachment_id: attachment.model_dump(mode="json")
+            for attachment_id, attachment in self.attachments.items()
+        }
+        self._attachment_index_path.write_text(json.dumps(data, indent=2))
