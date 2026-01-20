@@ -475,6 +475,6 @@ For building a unified interface, map parameters as follows:
 
 ---
 
-## Simplified Schema
+## Project Schema
 
-For a simplified schema optimized for common use cases, see [storyboard_schema.md](./storyboard_schema.md).
+For the project schema optimized for multi-segment video generation, see [project_schema.md](./project_schema.md).

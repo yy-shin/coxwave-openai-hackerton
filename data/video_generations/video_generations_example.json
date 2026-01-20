@@ -1,0 +1,148 @@
+{
+  "project_id": "project_abc123",
+  "created_at": "2025-01-20T10:30:00Z",
+  "status": "completed",
+  "segments": [
+    {
+      "segment_index": 0,
+      "scene_description": "Opening shot: Cookie character appears in a magical forest",
+      "status": "completed",
+      "generation_results": [
+        {
+          "input_index": 0,
+          "provider": "veo",
+          "video": {
+            "id": "veo_gen_001",
+            "status": "completed",
+            "created_at": "2025-01-20T10:30:05Z",
+            "video_url": "https://storage.googleapis.com/veo-outputs/video_001.mp4",
+            "thumbnail_url": "https://storage.googleapis.com/veo-outputs/thumb_001.jpg",
+            "duration": 8,
+            "resolution": "720p",
+            "has_audio": true,
+            "selected": true
+          }
+        },
+        {
+          "input_index": 0,
+          "provider": "veo",
+          "video": {
+            "id": "veo_gen_002",
+            "status": "completed",
+            "created_at": "2025-01-20T10:30:05Z",
+            "video_url": "https://storage.googleapis.com/veo-outputs/video_002.mp4",
+            "thumbnail_url": "https://storage.googleapis.com/veo-outputs/thumb_002.jpg",
+            "duration": 8,
+            "resolution": "720p",
+            "has_audio": true,
+            "selected": false
+          }
+        },
+        {
+          "input_index": 1,
+          "provider": "sora",
+          "video": {
+            "id": "video_sora_101",
+            "status": "completed",
+            "progress": 100,
+            "created_at": "2025-01-20T10:30:10Z",
+            "video_url": "https://api.openai.com/v1/videos/video_sora_101/content/video.mp4",
+            "duration": 8,
+            "resolution": "1280x720",
+            "has_audio": false,
+            "selected": false
+          }
+        },
+        {
+          "input_index": 1,
+          "provider": "sora",
+          "video": {
+            "id": "video_sora_102",
+            "status": "completed",
+            "progress": 100,
+            "created_at": "2025-01-20T10:30:10Z",
+            "video_url": "https://api.openai.com/v1/videos/video_sora_102/content/video.mp4",
+            "duration": 8,
+            "resolution": "1280x720",
+            "has_audio": false,
+            "selected": false
+          }
+        }
+      ]
+    },
+    {
+      "segment_index": 1,
+      "scene_description": "Transformation: Cookie gains superpowers with glowing effects",
+      "status": "completed",
+      "generation_results": [
+        {
+          "input_index": 0,
+          "provider": "veo",
+          "video": {
+            "id": "veo_gen_004",
+            "status": "completed",
+            "created_at": "2025-01-20T10:32:00Z",
+            "video_url": "https://storage.googleapis.com/veo-outputs/video_004.mp4",
+            "thumbnail_url": "https://storage.googleapis.com/veo-outputs/thumb_004.jpg",
+            "duration": 8,
+            "resolution": "720p",
+            "has_audio": true,
+            "selected": true
+          }
+        },
+        {
+          "input_index": 0,
+          "provider": "veo",
+          "video": {
+            "id": "veo_gen_005",
+            "status": "completed",
+            "created_at": "2025-01-20T10:32:00Z",
+            "video_url": "https://storage.googleapis.com/veo-outputs/video_005.mp4",
+            "thumbnail_url": "https://storage.googleapis.com/veo-outputs/thumb_005.jpg",
+            "duration": 8,
+            "resolution": "720p",
+            "has_audio": true,
+            "selected": false
+          }
+        }
+      ]
+    },
+    {
+      "segment_index": 2,
+      "scene_description": "Finale: Superhero cookie in action pose with logo reveal",
+      "status": "completed",
+      "generation_results": [
+        {
+          "input_index": 0,
+          "provider": "sora",
+          "video": {
+            "id": "video_sora_789",
+            "status": "completed",
+            "progress": 100,
+            "created_at": "2025-01-20T10:34:00Z",
+            "video_url": "https://api.openai.com/v1/videos/video_sora_789/content/video.mp4",
+            "duration": 8,
+            "resolution": "1280x720",
+            "has_audio": false,
+            "selected": true
+          }
+        },
+        {
+          "input_index": 0,
+          "provider": "sora",
+          "video": {
+            "id": "video_sora_790",
+            "status": "completed",
+            "progress": 100,
+            "created_at": "2025-01-20T10:34:00Z",
+            "video_url": "https://api.openai.com/v1/videos/video_sora_790/content/video.mp4",
+            "duration": 8,
+            "resolution": "1280x720",
+            "has_audio": false,
+            "selected": false
+          }
+        }
+      ]
+    }
+  ]
+}

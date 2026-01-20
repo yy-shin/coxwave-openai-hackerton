@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VideoGenerations",
+  "description": "Container for video generation results linked to a project",
+  "type": "object",
+  "required": ["project_id", "created_at", "segments"],
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "Reference to the source project"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when generation was initiated"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "completed", "failed"],
+      "description": "Overall status of all video generations"
+    },
+    "segments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/SegmentGeneration" },
+      "minItems": 1,
+      "description": "Generation results for each segment in the storyboard"
+    }
+  },
+  "$defs": {
+    "SegmentGeneration": {
+      "type": "object",
+      "description": "Video generation results for a single storyboard segment",
+      "required": ["segment_index", "generation_results"],
+      "properties": {
+        "segment_index": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Position of this segment in the storyboard (0-indexed)"
+        },
+        "scene_description": {
+          "type": "string",
+          "description": "Human-readable scene description (copied from project)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed", "failed"],
+          "description": "Status of generation for this segment"
+        },
+        "generation_results": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GenerationResult" },
+          "minItems": 1,
+          "description": "Results for each generation output (multiple results can share the same input_index)"
+        }
+      }
+    },
+    "GenerationResult": {
+      "type": "object",
+      "description": "Single video output from a generation_input",
+      "required": ["input_index", "provider", "video"],
+      "properties": {
+        "input_index": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index of the generation_input this result corresponds to"
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["sora", "veo"],
+          "description": "Video generation provider used"
+        },
+        "video": {
+          "$ref": "#/$defs/GeneratedVideo",
+          "description": "The generated video output"
+        }
+      }
+    },
+    "GeneratedVideo": {
+      "type": "object",
+      "description": "Individual generated video result",
+      "required": ["id", "status", "created_at"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Provider's unique video identifier"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["queued", "in_progress", "completed", "failed"],
+          "description": "Generation status for this video"
+        },
+        "progress": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Generation progress percentage (optional)"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when generation started"
+        },
+        "video_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Download URL for the generated video"
+        },
+        "thumbnail_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for video thumbnail (optional)"
+        },
+        "duration": {
+          "type": "integer",
+          "description": "Video duration in seconds"
+        },
+        "resolution": {
+          "type": "string",
+          "description": "Video resolution (e.g., '720p', '1280x720')"
+        },
+        "has_audio": {
+          "type": "boolean",
+          "description": "Whether the video contains audio"
+        },
+        "selected": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether user has selected this video for final assembly"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if generation failed"
+        }
+      }
+    }
+  }
+}
