@@ -213,5 +213,5 @@ data/videos/*.webm
 data/videos/*.json
 data/images/*.png
 
-.cluade/CLAUDE.md
+.claude/settings.local.json
 *.mp4

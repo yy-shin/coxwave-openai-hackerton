@@ -171,7 +171,7 @@ class VeoProvider(VideoProvider):
         aspect_ratio = self._get_aspect_ratio(config)
 
         # Build generation config
-        model_name = input_data.model or "veo-3.1-generate-preview"
+        model_name = input_data.model or "veo-3.1-fast-generate-preview"
 
         # Build config kwargs - generate_audio and person_generation only work in Vertex AI
         config_kwargs = {
@@ -285,7 +285,7 @@ class VeoProvider(VideoProvider):
         """
         duration = self._validate_duration(config.duration)
         aspect_ratio = self._get_aspect_ratio(config)
-        model_name = input_data.model or "veo-3.1-generate-preview"
+        model_name = input_data.model or "veo-3.1-fast-generate-preview"
         num_outputs = input_data.num_outputs or 1
 
         # Build config kwargs - generate_audio and person_generation only work in Vertex AI

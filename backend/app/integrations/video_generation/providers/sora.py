@@ -97,6 +97,19 @@ class SoraProvider(VideoProvider):
             video_id = data.get("id", "")
             video_url = f"{self.BASE_URL}/videos/{video_id}/content"
 
+        # Extract error message from nested error object or failure_reason
+        error_msg = data.get("failure_reason")
+        if not error_msg:
+            error_data = data.get("error")
+            if error_data:
+                if isinstance(error_data, dict):
+                    # Error is nested object: {"code": "...", "message": "..."}
+                    error_msg = error_data.get("message")
+                    if error_data.get("code"):
+                        error_msg = f"[{error_data['code']}] {error_msg}"
+                else:
+                    error_msg = str(error_data)
+
         return GeneratedVideo(
             id=data.get("id", ""),
             status=data.get("status", "queued"),
@@ -106,7 +119,7 @@ class SoraProvider(VideoProvider):
             duration=data.get("seconds"),
             resolution=data.get("size"),
             has_audio=False,  # Sora doesn't generate audio
-            error=data.get("failure_reason") or data.get("error"),
+            error=error_msg,
         )
 
     async def generate(

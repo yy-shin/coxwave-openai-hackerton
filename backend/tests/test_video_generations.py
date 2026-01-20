@@ -705,14 +705,14 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
     Args:
         image_paths: List of local file paths to test images (9:16 aspect ratio).
 
-    Uses Sora provider with varied configurations:
-    - input_image: first-frame image for Sora (local file paths)
+    Uses Sora provider only (Veo quota exhausted):
+    - Sora basic: text-to-video
+    - Sora with input_image: image-to-video
 
-    Note: Currently using Sora only due to Veo quota limits.
-    When Veo quota is available, can add Veo generations with negative_prompt.
+    Distribution: 21 Sora (all variations)
     """
     segments = [
-        # Segment 0: Sora basic | Sora + input_image | Sora basic
+        # Segment 0: Sora basic | Sora + input_image | Sora basic (different prompt)
         Segment(
             scene_description="Opening: Character emerges from portal",
             duration=8.0,
@@ -728,11 +728,11 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
                 ),
                 GenerationInput(
                     provider="sora",
-                    prompt="Magical portal opening in a mystical forest, ethereal glow, fantasy atmosphere",
+                    prompt="Magical portal opening in an enchanted forest, swirling energy and mystical lights",
                 ),
             ],
         ),
-        # Segment 1: Sora + input_image | Sora basic | Sora basic
+        # Segment 1: Sora + input_image | Sora basic | Sora basic (different prompt)
         Segment(
             scene_description="Action: Character runs through enchanted landscape",
             duration=8.0,
@@ -752,7 +752,7 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
                 ),
             ],
         ),
-        # Segment 2: Sora basic | Sora basic | Sora + input_image
+        # Segment 2: Sora basic | Sora + input_image | Sora basic (different prompt)
         Segment(
             scene_description="Dramatic: Character faces challenge",
             duration=8.0,
@@ -763,16 +763,16 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
                 ),
                 GenerationInput(
                     provider="sora",
-                    prompt="A hero confronting destiny, dramatic lighting, cinematic composition",
-                ),
-                GenerationInput(
-                    provider="sora",
                     prompt="Character faces a dramatic challenge with swirling energy, epic composition, golden hour lighting",
                     input_image=ImageInput(file_path=image_paths[2]),
                 ),
+                GenerationInput(
+                    provider="sora",
+                    prompt="A hero confronting destiny, dramatic lighting, cinematic composition",
+                ),
             ],
         ),
-        # Segment 3: Sora basic | Sora + input_image | Sora basic
+        # Segment 3: Sora basic | Sora + input_image | Sora basic (different prompt)
         Segment(
             scene_description="Transformation: Character powers up",
             duration=8.0,
@@ -792,7 +792,7 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
                 ),
             ],
         ),
-        # Segment 4: Sora basic | Sora basic | Sora + input_image
+        # Segment 4: Sora basic | Sora + input_image | Sora basic (different prompt)
         Segment(
             scene_description="Victory: Character triumphs",
             duration=8.0,
@@ -803,16 +803,16 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
                 ),
                 GenerationInput(
                     provider="sora",
-                    prompt="Celebration scene with colorful fireworks exploding in the night sky, slow motion",
-                ),
-                GenerationInput(
-                    provider="sora",
                     prompt="Victory celebration with confetti and sparkles, joyful atmosphere",
                     input_image=ImageInput(file_path=image_paths[1]),
                 ),
+                GenerationInput(
+                    provider="sora",
+                    prompt="Celebration scene with colorful fireworks exploding in the night sky, slow motion",
+                ),
             ],
         ),
-        # Segment 5: Sora + input_image | Sora basic | Sora basic
+        # Segment 5: Sora + input_image | Sora basic | Sora basic (different prompt)
         Segment(
             scene_description="Epilogue: Character looks to the horizon",
             duration=8.0,
@@ -832,7 +832,7 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
                 ),
             ],
         ),
-        # Segment 6: Sora basic | Sora + input_image | Sora basic
+        # Segment 6: Sora basic | Sora + input_image | Sora basic (different prompt)
         Segment(
             scene_description="Finale: Logo reveal with special effects",
             duration=8.0,
@@ -856,7 +856,7 @@ def _create_test_video_project_state(image_paths: list[str]) -> VideoProjectStat
 
     return VideoProjectState(
         title="Real Integration Test Project",
-        description="Test project with 21 video generations across Veo and Sora",
+        description="Test project with 21 video generations using Sora",
         aspect_ratio="9:16",
         total_duration=56,  # 7 segments × 8 seconds
         storyboard=Storyboard(segments=segments),
