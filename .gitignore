@@ -212,3 +212,5 @@ data/videos/*.mp4
 data/videos/*.webm
 data/videos/*.json
 data/images/*.png
+
+.cluade/CLAUDE.md
