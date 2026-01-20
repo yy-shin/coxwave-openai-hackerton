@@ -6,9 +6,14 @@
 
 ## Demo
 
-> **[데모 영상 링크 추가 예정]**
+```bash
+# 환경 변수 설정
+cp .env.sample .env
+# OPENAI_API_KEY, GOOGLE_API_KEY 입력
 
-![OvenAI Demo](docs/demo-screenshot.png)
+# 실행
+npm run
+```
 
 ---
 

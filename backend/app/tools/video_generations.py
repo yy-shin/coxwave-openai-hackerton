@@ -122,36 +122,52 @@ def _convert_generation_input_to_provider_input(
 def _derive_segment_status(
     results: list[GenerationResult],
 ) -> Literal["pending", "in_progress", "completed", "failed"]:
-    """Derive segment status from generation results."""
+    """Derive segment status from generation results.
+
+    - If any is in_progress/queued → in_progress
+    - If all are done (completed/failed) and at least one completed → completed
+    - If all failed → failed
+    """
     if not results:
         return "pending"
 
     statuses = [r.video.status for r in results]
 
-    if all(s == "completed" for s in statuses):
+    # Still processing
+    if any(s in ("in_progress", "queued") for s in statuses):
+        return "in_progress"
+
+    # All done - check if at least one completed
+    if any(s == "completed" for s in statuses):
         return "completed"
     if any(s == "failed" for s in statuses):
         return "failed"
-    if any(s in ("in_progress", "queued") for s in statuses):
-        return "in_progress"
     return "pending"
 
 
 def _derive_overall_status(
     segments: list[SegmentGeneration],
 ) -> Literal["pending", "in_progress", "completed", "failed"]:
-    """Derive overall status from segment statuses."""
+    """Derive overall status from segment statuses.
+
+    - If any is in_progress → in_progress
+    - If all are done (completed/failed) and at least one completed → completed
+    - If all failed → failed
+    """
     if not segments:
         return "pending"
 
     statuses = [s.status for s in segments]
 
-    if all(s == "completed" for s in statuses):
+    # Still processing
+    if any(s == "in_progress" for s in statuses):
+        return "in_progress"
+
+    # All done - check if at least one completed
+    if any(s == "completed" for s in statuses):
         return "completed"
     if any(s == "failed" for s in statuses):
         return "failed"
-    if any(s == "in_progress" for s in statuses):
-        return "in_progress"
     return "pending"
 
 
