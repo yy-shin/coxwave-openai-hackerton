@@ -17,6 +17,15 @@ export const translations = {
     generating: "생성 중...",
     generate: "생성하기",
     seconds: "초",
+    videoDescription: "비디오 설명",
+    sceneDescription: "씬 설명",
+    prompt: "프롬프트",
+    inputImage: "시작 이미지",
+    lastFrame: "종료 이미지",
+    referenceImages: "참조 이미지",
+    noImage: "이미지 없음",
+    veoOnly: "Veo 전용",
+    optional: "선택",
 
     // Video Generation Panel
     videoGeneration: "비디오 생성",
@@ -57,6 +66,15 @@ export const translations = {
     generating: "Generating...",
     generate: "Generate",
     seconds: "s",
+    videoDescription: "Video Description",
+    sceneDescription: "Scene Description",
+    prompt: "Prompt",
+    inputImage: "Start Image",
+    lastFrame: "End Image",
+    referenceImages: "Reference Images",
+    noImage: "No image",
+    veoOnly: "Veo only",
+    optional: "Optional",
 
     // Video Generation Panel
     videoGeneration: "Video Generation",

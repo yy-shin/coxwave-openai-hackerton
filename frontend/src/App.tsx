@@ -36,10 +36,11 @@ export default function App() {
     <div className={containerClass}>
       <div className={headerBarClass}>
         <div className="relative mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
-          <h1 className="text-base font-semibold tracking-wide sm:text-lg">
-            OvenAI
+          <h1 className="flex items-center gap-4 text-base font-semibold tracking-wide sm:text-lg">
+            <img src="/favicon.png" alt="OvenAI" className="h-[24px] w-7 sm:h-[26px] sm:w-8" />
+            <span className="translate-y-[1px]">OvenAI</span>
           </h1>
-          <p className="hidden flex-1 text-sm text-slate-600 sm:block dark:text-slate-300">
+          <p className="hidden flex-1 translate-y-[1px] text-sm text-slate-600 sm:block dark:text-slate-300">
             {i18n.tagline}
           </p>
           <div className="ml-auto flex items-center gap-2">
