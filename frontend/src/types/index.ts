@@ -8,9 +8,7 @@ export type RightPanelType = "storyboard" | "video" | "final";
 // Storyboard & Video Types
 // ============================================
 export type ImageInput = {
-  url?: string;
-  base64?: string;
-  mime_type?: "image/jpeg" | "image/png" | "image/webp";
+  filePath: string;
 };
 
 export type BaseClip = {
@@ -61,16 +59,16 @@ export type VideoCandidate = {
 // Backend Project State Types (from update_project_status)
 // ============================================
 
-export type BackendReferenceImage = {
-  url: string;
+export type BackendImageInput = {
+  filePath: string;
 };
 
 export type BackendGenerationInput = {
   provider: "veo" | "sora";
   prompt: string;
   negativePrompt: string | null;
-  referenceImages: BackendReferenceImage[] | null;
-  inputImage: BackendReferenceImage | null;
+  referenceImages: BackendImageInput[] | null;
+  inputImage: BackendImageInput | null;
 };
 
 export type BackendSegment = {
@@ -93,7 +91,7 @@ export type ProjectStatePayload = {
   aspectRatio: string;
   totalDuration: number;
   referenceVideoUrl: string | null;
-  referenceImages: BackendReferenceImage[];
+  referenceImages: BackendImageInput[];
   storyboard: BackendStoryboard;
   storyboardApproved: boolean;
   finalVideoUrl: string | null;

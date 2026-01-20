@@ -190,26 +190,13 @@ Project
     },
     "ImageInput": {
       "type": "object",
+      "required": ["file_path"],
       "properties": {
-        "url": {
+        "file_path": {
           "type": "string",
-          "format": "uri",
-          "description": "URL to image file"
-        },
-        "base64": {
-          "type": "string",
-          "description": "Base64-encoded image data"
-        },
-        "mime_type": {
-          "type": "string",
-          "enum": ["image/jpeg", "image/png", "image/webp"],
-          "description": "Image MIME type"
+          "description": "Local file path to the image"
         }
-      },
-      "oneOf": [
-        { "required": ["url"] },
-        { "required": ["base64", "mime_type"] }
-      ]
+      }
     }
   }
 }
@@ -236,7 +223,7 @@ Project
             "prompt": "A cute 2D animated cookie character with big eyes stands in a colorful magical forest, sunlight filtering through trees, whimsical atmosphere, smooth animation, vibrant colors",
             "negative_prompt": "blurry, low quality, distorted, realistic",
             "reference_images": [
-              { "url": "https://example.com/cookie_character.png" }
+              { "file_path": "/path/to/cookie_character.png" }
             ]
           }
         ]
@@ -250,7 +237,7 @@ Project
             "prompt": "The cookie character begins glowing with golden energy, magical transformation sequence, swirling particles, dynamic camera movement, epic power-up moment, 2D animated style",
             "negative_prompt": "blurry, distorted",
             "input_image": {
-              "url": "https://example.com/transformation_start.png"
+              "file_path": "/path/to/transformation_start.png"
             }
           }
         ]

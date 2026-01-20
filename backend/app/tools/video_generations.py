@@ -1,6 +1,8 @@
 """Video generation tool that converts VideoProjectState to VideoGenerations."""
 
 import asyncio
+import base64
+import mimetypes
 import os
 from datetime import UTC, datetime
 from pathlib import Path
@@ -19,7 +21,7 @@ from app.integrations.video_generation import (
     VideoGenerationInput,
     VideoGenerationService,
 )
-from app.video_project_state import GenerationInput, ReferenceImage, VideoProjectState
+from app.video_project_state import GenerationInput, ImageInput as ProjectImageInput, VideoProjectState
 
 
 class SegmentGeneration(BaseModel):
@@ -52,9 +54,26 @@ class VideoGenerations(BaseModel):
     )
 
 
-def _convert_reference_image_to_image_input(ref_image: ReferenceImage) -> ImageInput:
-    """Convert a ReferenceImage to ImageInput."""
-    return ImageInput(url=ref_image.url)
+def _convert_project_image_to_api_input(project_image: ProjectImageInput) -> ImageInput:
+    """Convert a ProjectImageInput (file_path) to API ImageInput (base64).
+
+    Reads the image file from the local file path and converts it to base64
+    for sending to video generation providers.
+    """
+    file_path = project_image.file_path
+
+    # Determine MIME type from file extension
+    mime_type, _ = mimetypes.guess_type(file_path)
+    if mime_type not in ("image/jpeg", "image/png", "image/webp"):
+        mime_type = "image/png"  # Default to PNG if unknown
+
+    # Read file and encode as base64
+    with open(file_path, "rb") as f:
+        image_data = f.read()
+
+    base64_data = base64.b64encode(image_data).decode("utf-8")
+
+    return ImageInput(base64=base64_data, mime_type=mime_type)  # type: ignore
 
 
 def _convert_generation_input_to_provider_input(
@@ -66,7 +85,7 @@ def _convert_generation_input_to_provider_input(
     # Convert input_image if present
     input_image: ImageInput | None = None
     if gen_input.input_image:
-        input_image = _convert_reference_image_to_image_input(gen_input.input_image)
+        input_image = _convert_project_image_to_api_input(gen_input.input_image)
 
     if provider == "sora":
         return SoraInput(
@@ -79,7 +98,7 @@ def _convert_generation_input_to_provider_input(
         reference_images: list[ImageInput] | None = None
         if gen_input.reference_images:
             reference_images = [
-                _convert_reference_image_to_image_input(img)
+                _convert_project_image_to_api_input(img)
                 for img in gen_input.reference_images
             ]
 

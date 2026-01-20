@@ -214,3 +214,4 @@ data/videos/*.json
 data/images/*.png
 
 .cluade/CLAUDE.md
+*.mp4

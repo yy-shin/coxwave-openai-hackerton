@@ -8,10 +8,10 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 
-class ReferenceImage(BaseModel):
-    """A reference image with URL."""
+class ImageInput(BaseModel):
+    """An image input with local file path."""
 
-    url: str
+    file_path: str = Field(description="Local file path to the image")
 
 
 class GenerationInput(BaseModel):
@@ -20,8 +20,8 @@ class GenerationInput(BaseModel):
     provider: Literal["veo", "sora"]
     prompt: str
     negative_prompt: str | None = None
-    reference_images: list[ReferenceImage] | None = None
-    input_image: ReferenceImage | None = None
+    reference_images: list[ImageInput] | None = None
+    input_image: ImageInput | None = None
 
 
 class Segment(BaseModel):
@@ -52,7 +52,7 @@ class VideoProjectState(BaseModel):
 
     # Input specifications
     reference_video_url: str | None = None
-    reference_images: list[ReferenceImage] = Field(default_factory=list)
+    reference_images: list[ImageInput] = Field(default_factory=list)
 
     # Storyboard
     storyboard: Storyboard = Field(default_factory=Storyboard)
@@ -129,7 +129,7 @@ class VideoProjectState(BaseModel):
             "aspectRatio": self.aspect_ratio,
             "totalDuration": self.total_duration,
             "referenceVideoUrl": self.reference_video_url,
-            "referenceImages": [img.model_dump() for img in self.reference_images],
+            "referenceImages": [{"filePath": img.file_path} for img in self.reference_images],
             "storyboard": {
                 "segments": [
                     {
@@ -141,12 +141,12 @@ class VideoProjectState(BaseModel):
                                 "prompt": gi.prompt,
                                 "negativePrompt": gi.negative_prompt,
                                 "referenceImages": (
-                                    [img.model_dump() for img in gi.reference_images]
+                                    [{"filePath": img.file_path} for img in gi.reference_images]
                                     if gi.reference_images
                                     else None
                                 ),
                                 "inputImage": (
-                                    gi.input_image.model_dump()
+                                    {"filePath": gi.input_image.file_path}
                                     if gi.input_image
                                     else None
                                 ),

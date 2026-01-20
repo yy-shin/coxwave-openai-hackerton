@@ -332,16 +332,25 @@ function ImageField({ image, onChange, i18n, disabled }: ImageFieldProps) {
     );
   }
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (!file.type.startsWith("image/")) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string;
-      const mimeType = file.type as "image/jpeg" | "image/png" | "image/webp";
-      onChange({ base64, mime_type: mimeType });
-    };
-    reader.readAsDataURL(file);
+    // Upload file to backend and get file path
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        const data = await response.json();
+        onChange({ filePath: data.filePath });
+      }
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -369,14 +378,14 @@ function ImageField({ image, onChange, i18n, disabled }: ImageFieldProps) {
     input.click();
   };
 
-  const hasImage = image?.url || image?.base64;
+  const hasImage = image?.filePath;
 
   return (
     <div>
       {hasImage ? (
         <div className="group relative aspect-video overflow-hidden rounded-lg border border-slate-200 bg-slate-100 dark:border-slate-600 dark:bg-slate-700">
           <img
-            src={image?.base64 || image?.url}
+            src={image?.filePath ? `/api/files?path=${encodeURIComponent(image.filePath)}` : ""}
             alt="Preview"
             className="h-full w-full object-cover"
             onError={(e) => {
@@ -433,29 +442,33 @@ function ReferenceImagesField({ images, onChange, disabled, i18n }: ReferenceIma
     );
   }
 
-  const handleFiles = (files: FileList) => {
+  const handleFiles = async (files: FileList) => {
     const newImages: ImageInput[] = [];
-    let processed = 0;
 
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith("image/")) {
-        processed++;
-        return;
-      }
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        const mimeType = file.type as "image/jpeg" | "image/png" | "image/webp";
-        newImages.push({ base64, mime_type: mimeType });
-        processed++;
+      // Upload file to backend and get file path
+      const formData = new FormData();
+      formData.append("file", file);
 
-        if (processed === files.length && newImages.length > 0) {
-          onChange([...(images || []), ...newImages]);
+      try {
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (response.ok) {
+          const data = await response.json();
+          newImages.push({ filePath: data.filePath });
         }
-      };
-      reader.readAsDataURL(file);
-    });
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+      }
+    }
+
+    if (newImages.length > 0) {
+      onChange([...(images || []), ...newImages]);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -518,7 +531,7 @@ function ReferenceImagesField({ images, onChange, disabled, i18n }: ReferenceIma
               className="group relative h-14 w-14 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-600"
             >
               <img
-                src={img.base64 || img.url}
+                src={img.filePath ? `/api/files?path=${encodeURIComponent(img.filePath)}` : ""}
                 alt={`Ref ${idx + 1}`}
                 className="h-full w-full object-cover"
               />

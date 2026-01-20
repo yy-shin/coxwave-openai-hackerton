@@ -30,11 +30,11 @@ class GenerationInputData(BaseModel):
     negative_prompt: str | None = Field(
         default=None, description="Negative prompt to avoid certain elements"
     )
-    reference_image_urls: List[str] = Field(
-        default_factory=list, description="List of reference image URLs"
+    reference_image_paths: List[str] = Field(
+        default_factory=list, description="List of local file paths to reference images"
     )
-    input_image_url: str | None = Field(
-        default=None, description="Input image URL for image-to-video"
+    input_image_path: str | None = Field(
+        default=None, description="Local file path to input image for image-to-video"
     )
 
 
@@ -227,7 +227,7 @@ async def create_storyboard(
     """Create a storyboard and display it to the user."""
     logger.info("[TOOL CALL] create_storyboard with %d segments", len(segments))
 
-    from .video_project_state import ReferenceImage
+    from .video_project_state import ImageInput
 
     storyboard_segments = [
         Segment(
@@ -239,13 +239,13 @@ async def create_storyboard(
                     prompt=gi.prompt,
                     negative_prompt=gi.negative_prompt,
                     reference_images=(
-                        [ReferenceImage(url=url) for url in gi.reference_image_urls]
-                        if gi.reference_image_urls
+                        [ImageInput(file_path=path) for path in gi.reference_image_paths]
+                        if gi.reference_image_paths
                         else None
                     ),
                     input_image=(
-                        ReferenceImage(url=gi.input_image_url)
-                        if gi.input_image_url
+                        ImageInput(file_path=gi.input_image_path)
+                        if gi.input_image_path
                         else None
                     ),
                 )
@@ -305,7 +305,7 @@ async def edit_storyboard_segment(
             "message": f"Invalid segment index {segment_index}. Storyboard has {len(state.storyboard.segments)} segments (0-{len(state.storyboard.segments) - 1}).",
         }
 
-    from .video_project_state import ReferenceImage
+    from .video_project_state import ImageInput
 
     # Convert SegmentInput to Segment
     updated_segment = Segment(
@@ -317,13 +317,13 @@ async def edit_storyboard_segment(
                 prompt=gi.prompt,
                 negative_prompt=gi.negative_prompt,
                 reference_images=(
-                    [ReferenceImage(url=url) for url in gi.reference_image_urls]
-                    if gi.reference_image_urls
+                    [ImageInput(file_path=path) for path in gi.reference_image_paths]
+                    if gi.reference_image_paths
                     else None
                 ),
                 input_image=(
-                    ReferenceImage(url=gi.input_image_url)
-                    if gi.input_image_url
+                    ImageInput(file_path=gi.input_image_path)
+                    if gi.input_image_path
                     else None
                 ),
             )

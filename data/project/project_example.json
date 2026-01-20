@@ -14,7 +14,7 @@
             "prompt": "A cute 2D animated cookie character with big eyes stands in a colorful magical forest, sunlight filtering through trees, whimsical atmosphere, smooth animation, vibrant colors",
             "negative_prompt": "blurry, low quality, distorted, realistic",
             "reference_images": [
-              { "url": "https://example.com/cookie_character.png" }
+              { "file_path": "/path/to/cookie_character.png" }
             ]
           },
           {
@@ -32,7 +32,7 @@
             "prompt": "The cookie character begins glowing with golden energy, magical transformation sequence, swirling particles, dynamic camera movement, epic power-up moment, 2D animated style",
             "negative_prompt": "blurry, distorted",
             "input_image": {
-              "url": "https://example.com/transformation_start.png"
+              "file_path": "/path/to/transformation_start.png"
             }
           }
         ]
