@@ -144,7 +144,6 @@ class VideoAssistantServer(ChatKitServer[dict[str, Any]]):
 
         def mutate(s):
             s.storyboard_approved = True
-            s.phase = "generating"
             s.touch()
 
         state = await self.project_store.mutate(thread.id, mutate)

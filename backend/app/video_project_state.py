@@ -4,19 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from datetime import datetime
-from enum import Enum
 from typing import Any, List, Optional
-
-
-class ProjectPhase(str, Enum):
-    """Current phase of the video generation workflow."""
-
-    CLARIFYING = "clarifying"  # Asking clarifying questions
-    STORYBOARD = "storyboard"  # Creating/reviewing storyboard
-    GENERATING = "generating"  # Video generation in progress
-    SELECTION = "selection"  # User selecting video variants
-    ASSEMBLING = "assembling"  # Final video assembly
-    COMPLETE = "complete"  # Project complete
 
 
 @dataclass
@@ -41,7 +29,6 @@ class VideoProjectState:
     """State for a video generation project."""
 
     title: str = "Untitled Project"
-    phase: ProjectPhase = ProjectPhase.CLARIFYING
 
     # Input specifications
     aspect_ratio: str = "9:16"  # Portrait default per CLAUDE.md
@@ -67,21 +54,14 @@ class VideoProjectState:
         """Update the updated_at timestamp."""
         self.updated_at = datetime.utcnow()
 
-    def set_phase(self, phase: ProjectPhase) -> None:
-        """Set the current workflow phase."""
-        self.phase = phase
-        self.touch()
-
     def set_storyboard(self, segments: List[VideoSegment]) -> None:
         """Set the storyboard segments."""
         self.segments = segments
-        self.phase = ProjectPhase.STORYBOARD
         self.touch()
 
     def approve_storyboard(self) -> None:
-        """Mark storyboard as approved and move to generation phase."""
+        """Mark storyboard as approved."""
         self.storyboard_approved = True
-        self.phase = ProjectPhase.GENERATING
         self.touch()
 
     def select_variant(self, segment_id: str, variant_index: int) -> None:
@@ -106,7 +86,6 @@ class VideoProjectState:
         self.thumbnail_url = thumbnail_url
         self.banner_url = banner_url
         self.marketing_copy = marketing_copy
-        self.phase = ProjectPhase.COMPLETE
         self.touch()
 
     def clone(self) -> "VideoProjectState":
@@ -117,7 +96,6 @@ class VideoProjectState:
         """Convert state to JSON-serializable payload for frontend."""
         payload: dict[str, Any] = {
             "title": self.title,
-            "phase": self.phase.value,
             "aspectRatio": self.aspect_ratio,
             "targetDurationSec": self.target_duration_sec,
             "description": self.description,
