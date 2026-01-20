@@ -51,7 +51,7 @@ function getInitialScheme(): ColorScheme {
   if (stored === "light" || stored === "dark") {
     return stored;
   }
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return "light";
 }
 
 function syncSchemeWithDocument(scheme: ColorScheme) {
