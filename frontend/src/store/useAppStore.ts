@@ -76,7 +76,10 @@ type AppState = {
   selectedVideoIds: Record<number, string>;
   selectVideo: (clipIndex: number, videoId: string) => void;
   storyboard: Storyboard;
+  originalStoryboard: Storyboard;
   setStoryboard: (storyboard: Storyboard) => void;
+  updateStoryboardDescription: (description: string) => void;
+  updateClip: (clipIndex: number, updates: Partial<Clip>) => void;
   isGeneratingVideos: boolean;
   setIsGeneratingVideos: (isGenerating: boolean) => void;
 };
@@ -315,7 +318,51 @@ export const useAppStore = create<AppState>((set, get) => {
         },
       ],
     },
-    setStoryboard: (storyboard) => set({ storyboard }),
+    originalStoryboard: {
+      description: "A high-energy game marketing video showcasing Cookie Run character transformation. Appeals to casual mobile gamers aged 18-35 through vibrant colors, dynamic action sequences, and character progression fantasy. Style: 2D animated with cel-shading effects.",
+      total_duration: 24,
+      clips: [
+        {
+          scene_description: "Opening shot: Cookie character appears in a magical forest",
+          provider: "veo",
+          prompt: "A cute 2D animated cookie character with big eyes stands in a colorful magical forest, sunlight filtering through trees, whimsical atmosphere, smooth animation, vibrant colors",
+          duration: 8,
+          negative_prompt: "blurry, low quality, distorted, realistic",
+          reference_images: [{ url: "https://example.com/cookie_character.png" }],
+        },
+        {
+          scene_description: "Transformation: Cookie gains superpowers with glowing effects",
+          provider: "veo",
+          prompt: "The cookie character begins glowing with golden energy, magical transformation sequence, swirling particles, dynamic camera movement, epic power-up moment, 2D animated style",
+          duration: 8,
+          negative_prompt: "blurry, distorted",
+          input_image: { url: "https://example.com/transformation_start.png" },
+        },
+        {
+          scene_description: "Finale: Superhero cookie in action pose with logo reveal",
+          provider: "sora",
+          prompt: "Superhero cookie character in heroic pose, cape flowing, magical energy surrounding them, camera pulls back to reveal Cookie Run logo, celebratory particle effects, 2D animated style",
+          duration: 8,
+        },
+      ],
+    },
+    setStoryboard: (storyboard) => set({ storyboard, originalStoryboard: storyboard }),
+    updateStoryboardDescription: (description) =>
+      set((state) => {
+        if (!state.storyboard) return state;
+        return {
+          storyboard: { ...state.storyboard, description },
+        };
+      }),
+    updateClip: (clipIndex, updates) =>
+      set((state) => {
+        if (!state.storyboard) return state;
+        const newClips = [...state.storyboard.clips];
+        newClips[clipIndex] = { ...newClips[clipIndex], ...updates } as Clip;
+        return {
+          storyboard: { ...state.storyboard, clips: newClips },
+        };
+      }),
     isGeneratingVideos: false,
     setIsGeneratingVideos: (isGenerating) => set({ isGeneratingVideos: isGenerating }),
   };

@@ -96,3 +96,8 @@ export const DEFAULT_CAT_STATE: CatStatePayload = {
   backstory: "",
   updatedAt: new Date().toISOString(),
 };
+
+// ============================================
+// i18n Types (re-exported from lib/i18n)
+// ============================================
+export type { Language, Translations } from "../lib/i18n";
