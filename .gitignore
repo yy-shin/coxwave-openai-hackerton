@@ -215,4 +215,3 @@ data/images/*.png
 data/attachments/
 
 .claude/settings.local.json
-*.mp4
