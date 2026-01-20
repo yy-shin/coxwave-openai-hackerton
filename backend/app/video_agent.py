@@ -58,6 +58,40 @@ class SegmentInput(BaseModel):
     )
 
 
+class VideoRequestGuardrailOutput(BaseModel):
+    """Output model for the video request guardrail check."""
+
+    is_off_topic: bool
+    reasoning: str
+
+
+guardrail_agent = Agent(
+    name="Video Request Guardrail",
+    instructions=(
+        "Check if the user's request is related to video creation, marketing, advertising, "
+        "or content production. Flag as off-topic if the request is completely unrelated "
+        "(e.g., asking for homework help, coding assistance, general knowledge questions, "
+        "or other tasks that have nothing to do with video/marketing content creation). "
+        "Requests about storyboards, video editing, promotional content, ads, and similar "
+        "topics should NOT be flagged as off-topic."
+    ),
+    output_type=VideoRequestGuardrailOutput,
+)
+
+
+@input_guardrail
+async def video_request_guardrail(
+    ctx: RunContextWrapper[None], agent: Agent, input: str | list[TResponseInputItem]
+) -> GuardrailFunctionOutput:
+    """Check if the request is related to video/marketing content creation."""
+    result = await Runner.run(guardrail_agent, input, context=ctx.context)
+
+    return GuardrailFunctionOutput(
+        output_info=result.final_output,
+        tripwire_triggered=result.final_output.is_off_topic,
+    )
+
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -447,6 +481,7 @@ video_agent = Agent[VideoAgentContext](
         edit_storyboard_segment,
         start_video_generation,
     ],
+    input_guardrails=[video_request_guardrail],
     # Stop inference after tool calls that produce widgets or require user input
     tool_use_behavior=StopAtTools(
         stop_at_tool_names=[
