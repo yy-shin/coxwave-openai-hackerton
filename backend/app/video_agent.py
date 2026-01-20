@@ -18,26 +18,27 @@ from chatkit.types import (
 from openai.types import Reasoning
 from pydantic import BaseModel, ConfigDict, Field
 
-from .video_project_state import VideoProjectState, VideoSegment
+from .video_project_state import GenerationInput, Segment, VideoProjectState
 from .video_project_store import VideoProjectStore
+
+
+class GenerationInputData(BaseModel):
+    """Input model for a generation provider configuration."""
+
+    provider: str = Field(description="Video generation provider ('veo', 'sora', 'kling')")
+    prompt: str = Field(description="The prompt for video generation")
+    negative_prompt: str | None = Field(default=None, description="Negative prompt to avoid certain elements")
+    reference_image_urls: List[str] = Field(default_factory=list, description="List of reference image URLs")
+    input_image_url: str | None = Field(default=None, description="Input image URL for image-to-video")
 
 
 class SegmentInput(BaseModel):
     """Input model for a storyboard segment."""
 
-    id: str = Field(description="Unique segment ID (e.g., 'seg_1')")
-    description: str = Field(description="What happens in this segment")
-    duration_sec: float = Field(
-        default=5.0, description="Duration in seconds (3-8 recommended)"
-    )
-    transition: str = Field(
-        default="cut", description="Transition type ('cut', 'fade', 'dissolve')"
-    )
-    key_elements: List[str] = Field(
-        default_factory=list, description="List of key visual elements"
-    )
-    video_model: str = Field(
-        default="sora", description="Preferred model ('sora', 'veo', 'kling')"
+    scene_description: str = Field(description="What happens in this segment")
+    duration: float = Field(default=8.0, description="Duration in seconds")
+    generation_inputs: List[GenerationInputData] = Field(
+        description="List of generation configurations for different providers"
     )
 
 
@@ -163,7 +164,7 @@ async def get_project_status(
         "Set project details like title, aspect ratio, duration, and description.\n"
         "- `title`: Project title\n"
         "- `aspect_ratio`: Video aspect ratio (e.g., '9:16', '16:9', '1:1')\n"
-        "- `target_duration_sec`: Target video duration in seconds (max 60)\n"
+        "- `total_duration`: Target video duration in seconds (max 60)\n"
         "- `description`: Brief description of the video concept"
     )
 )
@@ -171,7 +172,7 @@ async def set_project_details(
     ctx: RunContextWrapper[VideoAgentContext],
     title: str | None = None,
     aspect_ratio: str | None = None,
-    target_duration_sec: int | None = None,
+    total_duration: int | None = None,
     description: str | None = None,
 ):
     """Set project configuration details."""
@@ -182,8 +183,8 @@ async def set_project_details(
             state.title = title
         if aspect_ratio:
             state.aspect_ratio = aspect_ratio
-        if target_duration_sec:
-            state.target_duration_sec = min(target_duration_sec, 60)
+        if total_duration:
+            state.total_duration = min(total_duration, 60)
         if description:
             state.description = description
         state.touch()
@@ -204,7 +205,7 @@ async def set_project_details(
 @function_tool(
     description_override=(
         "Create and display a storyboard for the video.\n"
-        "- `segments`: List of segment objects with id, description, duration_sec, transition, key_elements, video_model"
+        "- `segments`: List of segment objects with scene_description, duration, and generation_inputs"
     )
 )
 async def create_storyboard(
@@ -214,21 +215,36 @@ async def create_storyboard(
     """Create a storyboard and display it to the user."""
     logger.info("[TOOL CALL] create_storyboard with %d segments", len(segments))
 
-    video_segments = [
-        VideoSegment(
-            segment_id=seg.id,
-            description=seg.description,
-            duration_sec=seg.duration_sec,
-            transition=seg.transition,
-            key_elements=seg.key_elements,
-            video_model=seg.video_model,
+    from .video_project_state import ReferenceImage
+
+    storyboard_segments = [
+        Segment(
+            scene_description=seg.scene_description,
+            duration=seg.duration,
+            generation_inputs=[
+                GenerationInput(
+                    provider=gi.provider,  # type: ignore[arg-type]
+                    prompt=gi.prompt,
+                    negative_prompt=gi.negative_prompt,
+                    reference_images=(
+                        [ReferenceImage(url=url) for url in gi.reference_image_urls]
+                        if gi.reference_image_urls
+                        else None
+                    ),
+                    input_image=(
+                        ReferenceImage(url=gi.input_image_url)
+                        if gi.input_image_url
+                        else None
+                    ),
+                )
+                for gi in seg.generation_inputs
+            ],
         )
         for seg in segments
     ]
 
     def mutate(state: VideoProjectState) -> None:
-        state.segments = video_segments
-        state.touch()
+        state.set_storyboard(storyboard_segments)
 
     state = await _update_state(ctx, mutate)
     await _add_hidden_context(
@@ -278,7 +294,7 @@ async def start_video_generation(
 
     return {
         "status": "generation_started",
-        "segments": len(state.segments),
+        "segments": len(state.storyboard.segments),
         "message": "Video generation has begun. This may take a few minutes per segment.",
     }
 
@@ -286,36 +302,36 @@ async def start_video_generation(
 @function_tool(
     description_override=(
         "Select a video variant for a segment.\n"
-        "- `segment_id`: The segment ID\n"
+        "- `segment_index`: The segment index (0-based)\n"
         "- `variant_index`: The index of the selected variant (0-based)"
     )
 )
 async def select_video_variant(
     ctx: RunContextWrapper[VideoAgentContext],
-    segment_id: str,
+    segment_index: int,
     variant_index: int,
 ):
     """Record the user's video variant selection."""
     logger.info(
-        "[TOOL CALL] select_video_variant: segment=%s, index=%d",
-        segment_id,
+        "[TOOL CALL] select_video_variant: segment=%d, index=%d",
+        segment_index,
         variant_index,
     )
 
     def mutate(state: VideoProjectState) -> None:
-        state.select_variant(segment_id, variant_index)
+        state.select_variant(segment_index, variant_index)
 
     state = await _update_state(ctx, mutate)
     await _add_hidden_context(
-        ctx, f"<SEGMENT_SELECTED>{segment_id}:{variant_index}</SEGMENT_SELECTED>"
+        ctx, f"<SEGMENT_SELECTED>{segment_index}:{variant_index}</SEGMENT_SELECTED>"
     )
     await _sync_status(
-        ctx, state, f"Selected variant {variant_index + 1} for segment {segment_id}"
+        ctx, state, f"Selected variant {variant_index + 1} for segment {segment_index + 1}"
     )
 
     return {
         "status": "selected",
-        "segment_id": segment_id,
+        "segment_index": segment_index,
         "variant_index": variant_index,
     }
 

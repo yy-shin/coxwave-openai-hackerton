@@ -2,61 +2,78 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
-from datetime import datetime
-from typing import Any, List, Optional
+from datetime import UTC, datetime
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
 
 
-@dataclass
-class VideoSegment:
+class ReferenceImage(BaseModel):
+    """A reference image with URL."""
+
+    url: str
+
+
+class GenerationInput(BaseModel):
+    """Input configuration for a video generation provider."""
+
+    provider: Literal["veo", "sora", "kling"]
+    prompt: str
+    negative_prompt: str | None = None
+    reference_images: list[ReferenceImage] | None = None
+    input_image: ReferenceImage | None = None
+
+
+class Segment(BaseModel):
     """A single segment/scene in the storyboard."""
 
-    segment_id: str
-    description: str
-    prompt: str = ""
-    duration_sec: float = 5.0
-    transition: str = "cut"
-    key_elements: List[str] = field(default_factory=list)
-    keyframe_image_url: Optional[str] = None
-    selected_video_url: Optional[str] = None
-    video_variants: List[str] = field(default_factory=list)  # URLs of generated variants
-    selected_variant_index: Optional[int] = None
-    video_model: str = "sora"  # sora, veo, or kling
+    scene_description: str
+    duration: float
+    generation_inputs: list[GenerationInput]
+    # Output fields (populated after generation)
+    selected_video_url: str | None = None
+    video_variants: list[str] = Field(default_factory=list)
+    selected_variant_index: int | None = None
 
 
-@dataclass
-class VideoProjectState:
+class Storyboard(BaseModel):
+    """Storyboard containing all segments."""
+
+    segments: list[Segment] = Field(default_factory=list)
+
+
+class VideoProjectState(BaseModel):
     """State for a video generation project."""
 
     title: str = "Untitled Project"
+    description: str = ""
+    aspect_ratio: str = "16:9"
+    total_duration: int = 30
 
     # Input specifications
-    aspect_ratio: str = "9:16"  # Portrait default per CLAUDE.md
-    target_duration_sec: int = 30
-    description: str = ""
-    reference_video_url: Optional[str] = None
-    reference_images: List[str] = field(default_factory=list)
+    reference_video_url: str | None = None
+    reference_images: list[ReferenceImage] = Field(default_factory=list)
 
     # Storyboard
-    segments: List[VideoSegment] = field(default_factory=list)
+    storyboard: Storyboard = Field(default_factory=Storyboard)
     storyboard_approved: bool = False
 
     # Outputs
-    final_video_url: Optional[str] = None
-    thumbnail_url: Optional[str] = None
-    banner_url: Optional[str] = None
-    marketing_copy: Optional[str] = None
+    final_video_url: str | None = None
+    thumbnail_url: str | None = None
+    banner_url: str | None = None
+    marketing_copy: str | None = None
 
     # Metadata
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     def touch(self) -> None:
         """Update the updated_at timestamp."""
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
-    def set_storyboard(self, segments: List[VideoSegment]) -> None:
+    def set_storyboard(self, segments: list[Segment]) -> None:
         """Set the storyboard segments."""
-        self.segments = segments
+        self.storyboard = Storyboard(segments=segments)
         self.touch()
 
     def approve_storyboard(self) -> None:
@@ -64,14 +81,13 @@ class VideoProjectState:
         self.storyboard_approved = True
         self.touch()
 
-    def select_variant(self, segment_id: str, variant_index: int) -> None:
-        """Select a video variant for a segment."""
-        for seg in self.segments:
-            if seg.segment_id == segment_id:
-                seg.selected_variant_index = variant_index
-                if seg.video_variants and 0 <= variant_index < len(seg.video_variants):
-                    seg.selected_video_url = seg.video_variants[variant_index]
-                break
+    def select_variant(self, segment_index: int, variant_index: int) -> None:
+        """Select a video variant for a segment by index."""
+        if 0 <= segment_index < len(self.storyboard.segments):
+            seg = self.storyboard.segments[segment_index]
+            seg.selected_variant_index = variant_index
+            if seg.video_variants and 0 <= variant_index < len(seg.video_variants):
+                seg.selected_video_url = seg.video_variants[variant_index]
         self.touch()
 
     def set_final_output(
@@ -88,35 +104,51 @@ class VideoProjectState:
         self.marketing_copy = marketing_copy
         self.touch()
 
-    def clone(self) -> "VideoProjectState":
+    def clone(self) -> VideoProjectState:
         """Create a copy of this state."""
-        return replace(self)
+        return self.model_copy(deep=True)
 
     def to_payload(self, thread_id: str | None = None) -> dict[str, Any]:
         """Convert state to JSON-serializable payload for frontend."""
-        payload: dict[str, Any] = {
+        payload: dict[str, Any] = self.model_dump(mode="json")
+        # Convert snake_case to camelCase for frontend
+        payload = {
             "title": self.title,
-            "aspectRatio": self.aspect_ratio,
-            "targetDurationSec": self.target_duration_sec,
             "description": self.description,
+            "aspectRatio": self.aspect_ratio,
+            "totalDuration": self.total_duration,
             "referenceVideoUrl": self.reference_video_url,
-            "referenceImages": self.reference_images,
-            "segments": [
-                {
-                    "segmentId": seg.segment_id,
-                    "description": seg.description,
-                    "prompt": seg.prompt,
-                    "durationSec": seg.duration_sec,
-                    "transition": seg.transition,
-                    "keyElements": seg.key_elements,
-                    "keyframeImageUrl": seg.keyframe_image_url,
-                    "selectedVideoUrl": seg.selected_video_url,
-                    "videoVariants": seg.video_variants,
-                    "selectedVariantIndex": seg.selected_variant_index,
-                    "videoModel": seg.video_model,
-                }
-                for seg in self.segments
-            ],
+            "referenceImages": [img.model_dump() for img in self.reference_images],
+            "storyboard": {
+                "segments": [
+                    {
+                        "sceneDescription": seg.scene_description,
+                        "duration": seg.duration,
+                        "generationInputs": [
+                            {
+                                "provider": gi.provider,
+                                "prompt": gi.prompt,
+                                "negativePrompt": gi.negative_prompt,
+                                "referenceImages": (
+                                    [img.model_dump() for img in gi.reference_images]
+                                    if gi.reference_images
+                                    else None
+                                ),
+                                "inputImage": (
+                                    gi.input_image.model_dump()
+                                    if gi.input_image
+                                    else None
+                                ),
+                            }
+                            for gi in seg.generation_inputs
+                        ],
+                        "selectedVideoUrl": seg.selected_video_url,
+                        "videoVariants": seg.video_variants,
+                        "selectedVariantIndex": seg.selected_variant_index,
+                    }
+                    for seg in self.storyboard.segments
+                ]
+            },
             "storyboardApproved": self.storyboard_approved,
             "finalVideoUrl": self.final_video_url,
             "thumbnailUrl": self.thumbnail_url,
