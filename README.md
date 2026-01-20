@@ -91,5 +91,5 @@ npm run
 |------|------|
 | 신윤열 | PM / 기획 |
 | 강혜민 | Agent 개발 |
-| 이성진 | Backend 개발 |
-| 박유호 | Frontend 개발 |
+| 홍성진 | Backend 개발 |
+| 정유호 | Frontend 개발 |
