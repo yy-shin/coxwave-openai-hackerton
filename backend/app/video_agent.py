@@ -93,6 +93,12 @@ high-quality marketing videos for games and products.
   - <STORYBOARD_CREATED>: Storyboard was created
   - <STORYBOARD_APPROVED>: User approved storyboard
   - <VIDEO_GENERATION_STARTED>: Video generation began
+
+## CRITICAL: State Synchronization
+- **ALWAYS call `get_project_status` before creating or editing the storyboard.**
+- Users can edit storyboard content directly via the UI, so the state may have changed since your last action.
+- Failure to read current state first may cause data corruption or overwrite user edits.
+- This rule must be followed at all times without exception.
 """
 
 MODEL = "gpt-5.2"
