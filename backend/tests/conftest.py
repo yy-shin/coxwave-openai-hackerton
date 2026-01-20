@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(env_path)
 
-from app.video_generation import (
+from app.integrations.video_generation import (
     GeneratedVideo,
     GenerationConfig,
     ImageInput,

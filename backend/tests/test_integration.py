@@ -24,7 +24,7 @@ import httpx
 import pytest
 from PIL import Image
 
-from app.video_generation import (
+from app.integrations.video_generation import (
     GeneratedVideo,
     GenerationConfig,
     ImageInput,

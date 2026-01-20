@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.video_generation import (
+from app.integrations.video_generation import (
     GeneratedVideo,
     GenerationConfig,
     GenerationResult,

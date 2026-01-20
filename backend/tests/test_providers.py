@@ -6,15 +6,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from app.video_generation import GenerationConfig, SoraInput, VeoInput
-from app.video_generation.exceptions import (
+from app.integrations.video_generation import GenerationConfig, SoraInput, VeoInput
+from app.integrations.video_generation.exceptions import (
     InvalidConfigurationError,
     ProviderAuthenticationError,
     VideoGenerationRequestError,
     VideoNotFoundError,
 )
-from app.video_generation.providers.sora import SoraProvider
-from app.video_generation.providers.veo import VeoProvider
+from app.integrations.video_generation.providers.sora import SoraProvider
+from app.integrations.video_generation.providers.veo import VeoProvider
 
 
 class TestSoraProvider:
@@ -189,7 +189,7 @@ class TestVeoProvider:
 
     def test_init_with_api_key(self):
         """Test initialization with explicit API key."""
-        with patch("app.video_generation.providers.veo.genai.Client") as mock_client:
+        with patch("app.integrations.video_generation.providers.veo.genai.Client") as mock_client:
             provider = VeoProvider(api_key="google-test-key")
             assert provider.api_key == "google-test-key"
             assert provider.provider_name == "veo"
@@ -197,7 +197,7 @@ class TestVeoProvider:
 
     def test_init_from_env(self, mock_google_api_key):
         """Test initialization from environment variable."""
-        with patch("app.video_generation.providers.veo.genai.Client"):
+        with patch("app.integrations.video_generation.providers.veo.genai.Client"):
             provider = VeoProvider()
             assert provider.api_key == "google-test-key-12345"
 
@@ -212,7 +212,7 @@ class TestVeoProvider:
 
     def test_validate_duration_supported(self, mock_google_api_key):
         """Test duration validation for supported values."""
-        with patch("app.video_generation.providers.veo.genai.Client"):
+        with patch("app.integrations.video_generation.providers.veo.genai.Client"):
             provider = VeoProvider()
             assert provider._validate_duration(4) == 4
             assert provider._validate_duration(6) == 6
@@ -220,7 +220,7 @@ class TestVeoProvider:
 
     def test_validate_duration_unsupported(self, mock_google_api_key):
         """Test duration validation rounds to closest supported value."""
-        with patch("app.video_generation.providers.veo.genai.Client"):
+        with patch("app.integrations.video_generation.providers.veo.genai.Client"):
             provider = VeoProvider()
             # 12 is not supported by Veo, should round to closest (8)
             result = provider._validate_duration(12)
@@ -229,7 +229,7 @@ class TestVeoProvider:
     @pytest.mark.asyncio
     async def test_generate_success(self, mock_google_api_key, sample_veo_input, default_config):
         """Test successful video generation."""
-        with patch("app.video_generation.providers.veo.genai.Client") as mock_client_class:
+        with patch("app.integrations.video_generation.providers.veo.genai.Client") as mock_client_class:
             mock_client = MagicMock()
             mock_operation = MagicMock()
             mock_operation.name = "operations/veo_test_001"
@@ -248,7 +248,7 @@ class TestVeoProvider:
         self, mock_google_api_key, sample_veo_input_with_options, default_config
     ):
         """Test video generation with all optional fields."""
-        with patch("app.video_generation.providers.veo.genai.Client") as mock_client_class:
+        with patch("app.integrations.video_generation.providers.veo.genai.Client") as mock_client_class:
             mock_client = MagicMock()
             mock_operation = MagicMock()
             mock_operation.name = "operations/veo_test_002"
@@ -265,7 +265,7 @@ class TestVeoProvider:
     @pytest.mark.asyncio
     async def test_get_status_completed(self, mock_google_api_key):
         """Test getting status of completed video."""
-        with patch("app.video_generation.providers.veo.genai.Client") as mock_client_class:
+        with patch("app.integrations.video_generation.providers.veo.genai.Client") as mock_client_class:
             mock_client = MagicMock()
 
             # Mock completed operation
@@ -296,7 +296,7 @@ class TestVeoProvider:
     @pytest.mark.asyncio
     async def test_get_status_in_progress(self, mock_google_api_key):
         """Test getting status of in-progress video."""
-        with patch("app.video_generation.providers.veo.genai.Client") as mock_client_class:
+        with patch("app.integrations.video_generation.providers.veo.genai.Client") as mock_client_class:
             mock_client = MagicMock()
 
             # Mock in-progress operation
@@ -314,7 +314,7 @@ class TestVeoProvider:
     @pytest.mark.asyncio
     async def test_get_status_failed(self, mock_google_api_key):
         """Test getting status of failed video."""
-        with patch("app.video_generation.providers.veo.genai.Client") as mock_client_class:
+        with patch("app.integrations.video_generation.providers.veo.genai.Client") as mock_client_class:
             mock_client = MagicMock()
 
             # Mock failed operation

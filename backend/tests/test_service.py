@@ -3,14 +3,14 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.video_generation import (
+from app.integrations.video_generation import (
     GeneratedVideo,
     GenerationConfig,
     SoraInput,
     VeoInput,
     VideoGenerationService,
 )
-from app.video_generation.exceptions import ProviderNotFoundError
+from app.integrations.video_generation.exceptions import ProviderNotFoundError
 
 
 class TestVideoGenerationService:
@@ -42,7 +42,7 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider.generate = AsyncMock(return_value=mock_video)
@@ -69,7 +69,7 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.VeoProvider"
+            "app.integrations.video_generation.service.VeoProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider.generate = AsyncMock(return_value=mock_video)
@@ -96,7 +96,7 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider.generate = AsyncMock(return_value=mock_video)
@@ -125,9 +125,9 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_sora_class, patch(
-            "app.video_generation.service.VeoProvider"
+            "app.integrations.video_generation.service.VeoProvider"
         ) as mock_veo_class:
             mock_sora = MagicMock()
             mock_sora.generate = AsyncMock(return_value=mock_sora_video)
@@ -163,7 +163,7 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider.get_status = AsyncMock(return_value=mock_video)
@@ -188,7 +188,7 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.VeoProvider"
+            "app.integrations.video_generation.service.VeoProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider.get_status = AsyncMock(return_value=mock_video)
@@ -213,7 +213,7 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider.wait_for_completion = AsyncMock(return_value=mock_video)
@@ -245,9 +245,9 @@ class TestVideoGenerationService:
         )
 
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_sora_class, patch(
-            "app.video_generation.service.VeoProvider"
+            "app.integrations.video_generation.service.VeoProvider"
         ) as mock_veo_class:
             mock_sora = MagicMock()
             mock_sora.wait_for_completion = AsyncMock(return_value=mock_sora_video)
@@ -273,7 +273,7 @@ class TestVideoGenerationService:
         service = VideoGenerationService()
 
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider.get_video_url = AsyncMock(
@@ -288,7 +288,7 @@ class TestVideoGenerationService:
     def test_provider_reuse(self, mock_all_api_keys):
         """Test that providers are reused across calls."""
         with patch(
-            "app.video_generation.service.SoraProvider"
+            "app.integrations.video_generation.service.SoraProvider"
         ) as mock_provider_class:
             mock_provider = MagicMock()
             mock_provider_class.return_value = mock_provider
