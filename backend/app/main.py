@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from pathlib import Path
 from typing import Any
 
 from chatkit.server import StreamingResult
@@ -14,8 +15,12 @@ from .server import VideoAssistantServer, create_chatkit_server
 from .tools.video_generations import (
     VideoGenerations,
     generate_videos_from_project,
+    poll_and_save_video_generations,
 )
 from .video_project_state import VideoProjectState
+
+# Project root for storing generated videos
+_PROJECT_ROOT = Path(__file__).parent.parent
 
 app = FastAPI(title="OvenAI Video Generation API")
 
@@ -84,8 +89,6 @@ async def poll_generation_status(generations: VideoGenerations) -> VideoGenerati
 
     Receives a VideoGenerations object containing video IDs and providers,
     and returns an updated VideoGenerations with latest status/progress/URLs.
-
-    Note: This is currently a stub that returns the input unchanged.
+    Downloads completed videos to local storage.
     """
-    # XXX: stub for now
-    return generations
+    return await poll_and_save_video_generations(generations, _PROJECT_ROOT)
