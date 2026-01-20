@@ -74,3 +74,24 @@ User Selection → Final Video Assembly
 
 - Sora: https://platform.openai.com/docs/guides/video-generation
 - Sora API: https://platform.openai.com/docs/api-reference/videos
+
+### ChatKit References
+This project uses ChatKit Python SDK and ChatKit.js (specifically, @openai/chatkit-react) for chat interface between agents and user.
+- ChatKit Python SDK: implements the ChatKit server, owns chat state, runs agents/tools, defines widget schemas and actions, and streams structured interaction events.
+- ChatKit frontend (ChatKit.js / @openai/chatkit-react): client runtime that sends user input and widget actions, renders streamed events and widgets, and manages the chat UI.
+
+**Frontend**: Use type definitions as primary reference.
+- React bindings for ChatKit: `frontend/node_modules/.pnpm/@openai+chatkit-react@1.3.0_react-dom@19.2.1_react@19.2.1__react@19.2.1/node_modules/@openai/chatkit-react/dist/index.d.ts`
+- Core ChatKit configuration types (Primary API reference): `frontend/node_modules/.pnpm/@openai+chatkit-react@1.3.0_react-dom@19.2.1_react@19.2.1__react@19.2.1/node_modules/@openai/chatkit/types/index.d.ts`
+- Widget component types (JSON structure sent from backend): `frontend/node_modules/.pnpm/@openai+chatkit-react@1.3.0_react-dom@19.2.1_react@19.2.1__react@19.2.1/node_modules/@openai/chatkit/types/widgets.d.ts`
+
+**Backend**: [Chatkit Python SDK documentation](https://github.com/openai/chatkit-python/blob/main/docs/index.md)
+- Concepts: https://github.com/openai/chatkit-python/blob/main/docs/concepts
+- Guides: https://github.com/openai/chatkit-python/tree/main/docs/guides
+
+**External Resources (use WebFetch tool)**:
+- [chatkit-python](https://github.com/openai/chatkit-python/)
+- [chatkit-js](https://openai.github.io/chatkit-js/) 
+- [openai-chatkit-starter-app](https://github.com/openai/openai-chatkit-starter-app)
+- [openai-chatkit-advanced-samples](https://github.com/openai/openai-chatkit-advanced-samples)
+- [ChatKit Guide](https://platform.openai.com/docs/guides/chatkit) — Official overview (requires OpenAI login)
