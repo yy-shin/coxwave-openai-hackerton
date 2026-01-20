@@ -5,7 +5,7 @@ import { ChatKitPanel } from "./components/ChatKitPanel";
 import type { ChatKit } from "./components/ChatKitPanel";
 import { FinalVideoPanel } from "./components/FinalVideoPanel";
 import { StoryboardPanel } from "./components/StoryboardPanel";
-import { VideoGenerationPanel } from "./components/VideoGenerationPanel";
+import { ClipSelectionPanel } from "./components/ClipSelectionPanel";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { LanguageToggle } from "./components/LanguageToggle";
 import { useAppStore } from "./store/useAppStore";
@@ -60,7 +60,7 @@ export default function App() {
           />
         )}
         {rightPanel === "video" && (
-          <VideoGenerationPanel
+          <ClipSelectionPanel
             className="relative min-h-[400px] w-full flex-1 overflow-hidden rounded-2xl bg-white/80 shadow-lg ring-1 ring-slate-200/60 backdrop-blur sm:rounded-3xl lg:h-[calc(100vh-140px)] lg:min-h-0 dark:bg-slate-900/70 dark:ring-slate-800/60"
           />
         )}

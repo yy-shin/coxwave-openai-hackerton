@@ -27,8 +27,8 @@ export const translations = {
     veoOnly: "Veo 전용",
     optional: "선택",
 
-    // Video Generation Panel
-    videoGeneration: "비디오 생성",
+    // Clip Selection Panel
+    clipSelection: "클립 선택",
     videoGenerationDesc: "각 클립별로 생성된 비디오를 확인하고 선택하세요",
     backToStoryboard: "스토리보드로 돌아가기",
     videoNotPlayable: "비디오를 재생할 수 없습니다.",
@@ -81,8 +81,8 @@ export const translations = {
     veoOnly: "Veo only",
     optional: "Optional",
 
-    // Video Generation Panel
-    videoGeneration: "Video Generation",
+    // Clip Selection Panel
+    clipSelection: "Clip Selection",
     videoGenerationDesc: "Review and select generated videos for each clip",
     backToStoryboard: "Back to Storyboard",
     videoNotPlayable: "Cannot play this video.",

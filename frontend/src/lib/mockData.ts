@@ -36,46 +36,63 @@ export const EXAMPLE_STORYBOARD: Storyboard = {
 
 // Mock clips for VideoGenerationPanel
 export const MOCK_CLIPS = [
-  { index: 0, scene_description: "Opening shot: Cookie character appears" },
-  { index: 1, scene_description: "Transformation: Cookie gains superpowers" },
-  { index: 2, scene_description: "Finale: Superhero cookie with logo reveal" },
+  { index: 0, scene_description: "Opening shot: Cookie character appears", duration: 8 },
+  { index: 1, scene_description: "Transformation: Cookie gains superpowers", duration: 8 },
+  { index: 2, scene_description: "Finale: Superhero cookie with logo reveal", duration: 8 },
 ];
 
 // Mock video candidates for VideoGenerationPanel
 export const MOCK_VIDEO_CANDIDATES: VideoCandidate[] = [
+  // Clip 0 - 4 candidates
   {
     id: "vid_0_1",
     clipIndex: 0,
-    url: "/videos/clip0_veo.mp4",
-    model: "Veo",
+    url: "/mock_video/phase1-1.mp4",
+    model: "Veo 3",
     status: "completed",
   },
   {
     id: "vid_0_2",
     clipIndex: 0,
-    url: "/videos/clip0_sora.mp4",
-    model: "Sora",
+    url: "/mock_video/phase1-2.mp4",
+    model: "Veo 3",
     status: "completed",
   },
+  {
+    id: "vid_0_3",
+    clipIndex: 0,
+    url: "/mock_video/phase1-3.mp4",
+    model: "Sora 2",
+    status: "completed",
+  },
+  {
+    id: "vid_0_4",
+    clipIndex: 0,
+    url: "/mock_video/phase1-4.mp4",
+    model: "Sora 2",
+    status: "completed",
+  },
+  // Clip 1 - 1 candidate
   {
     id: "vid_1_1",
     clipIndex: 1,
-    url: "/videos/clip1_veo.mp4",
-    model: "Veo",
+    url: "/mock_video/phase2-1.mp4",
+    model: "Veo 3",
     status: "completed",
   },
-  {
-    id: "vid_1_2",
-    clipIndex: 1,
-    url: "/videos/clip1_sora.mp4",
-    model: "Sora",
-    status: "generating",
-  },
+  // Clip 2 - 2 candidates
   {
     id: "vid_2_1",
     clipIndex: 2,
-    url: "/videos/clip2_sora.mp4",
-    model: "Sora",
+    url: "/mock_video/phase3-1.mp4",
+    model: "Veo 3",
+    status: "completed",
+  },
+  {
+    id: "vid_2_2",
+    clipIndex: 2,
+    url: "/mock_video/phase3-2.mp4",
+    model: "Sora 2",
     status: "completed",
   },
 ];

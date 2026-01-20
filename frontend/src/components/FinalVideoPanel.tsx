@@ -73,20 +73,16 @@ export function FinalVideoPanel({ className }: FinalVideoPanelProps) {
         {/* 비디오 플레이어 */}
         <div className="flex w-full justify-center">
           <div className="relative h-[480px] w-[270px] overflow-hidden rounded-xl bg-slate-900 shadow-2xl">
-            {/* TODO: 실제 합쳐진 비디오로 교체 */}
-            <div className="absolute inset-0 flex items-center justify-center px-6">
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-slate-800">
-                  <PlayIcon />
-                </div>
-                <p className="text-sm font-medium text-slate-300">
-                  {i18n.videoReady}
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  {i18n.pressPlayToWatch}
-                </p>
-              </div>
-            </div>
+            <video
+              className="h-full w-full object-contain"
+              controls
+              autoPlay
+              muted
+              loop
+            >
+              <source src="/mock_video/final.mp4" type="video/mp4" />
+              {i18n.videoNotPlayable}
+            </video>
           </div>
         </div>
       </PanelContent>
@@ -96,7 +92,12 @@ export function FinalVideoPanel({ className }: FinalVideoPanelProps) {
           <RefreshIcon className="h-4 w-4" />
           {i18n.createAgain}
         </Button>
-        <Button>
+        <Button onClick={() => {
+          const link = document.createElement("a");
+          link.href = "/mock_video/final.mp4";
+          link.download = "ovenai-video.mp4";
+          link.click();
+        }}>
           <DownloadIcon className="h-4 w-4" />
           {i18n.download}
         </Button>
