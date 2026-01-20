@@ -83,30 +83,6 @@ OvenAI는 **LLM 기반 멀티에이전트 워크플로**를 통해 이러한 문
 3. **Model Selector**: 장면 특성에 맞는 최적 모델 자동 선택 (Sora: 실사/시네마틱, Veo: 스타일라이즈)
 4. **Parallel Generation**: 21개 영상 동시 생성으로 대기 시간 최소화
 5. **Human-in-the-loop**: 각 단계에서 사용자 승인 및 실시간 수정 가능
-6. **Input Guardrail**: 영상/마케팅과 무관한 요청 자동 필터링
-
-### Safety: Input Guardrail
-
-OvenAI는 **Input Guardrail**을 통해 서비스 범위를 벗어난 요청을 자동으로 필터링합니다.
-
-```python
-guardrail_agent = Agent(
-    name="Video Request Guardrail",
-    instructions=(
-        "Check if the user's request is related to video creation, marketing, "
-        "advertising, or content production. Flag as off-topic if the request "
-        "is completely unrelated (e.g., homework help, coding assistance, "
-        "general knowledge questions)."
-    ),
-    output_type=VideoRequestGuardrailOutput,
-)
-```
-
-| 허용 요청 | 차단 요청 |
-|-----------|-----------|
-| 스토리보드 생성, 영상 편집, 프로모션 콘텐츠, 광고 제작 | 숙제 도움, 코딩 질문, 일반 지식 질문 |
-
-이를 통해 에이전트가 본연의 목적(마케팅 애셋 생성)에 집중하도록 보장합니다.
 
 ---
 
