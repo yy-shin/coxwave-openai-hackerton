@@ -2,22 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Development Commands
-
-```bash
-# Install dependencies
-uv sync
-
-# Run type checking
-uv run pyright
-
-# Install pre-commit hooks
-uv run pre-commit install
-
-# Run pre-commit on all files
-uv run pre-commit run --all-files
-```
-
 ## Adding Dependencies
 
 When adding new libraries, always search for the latest version on PyPI first.
