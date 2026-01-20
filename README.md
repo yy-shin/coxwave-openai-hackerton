@@ -4,7 +4,7 @@
 
 ## 데모
 
-(데모 영상 링크 추가 예정)
+<video src="docs/demo.mp4" controls></video>
 
 ## 문제 정의
 
