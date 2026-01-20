@@ -28,23 +28,25 @@ export default function App() {
   return (
     <div className={containerClass}>
       <div className={headerBarClass}>
-        <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-5 pr-20 sm:flex-row sm:items-center sm:gap-6 lg:py-6">
-          <h1 className="text-lg font-semibold tracking-wide">OvenAI</h1>
-          <p className="flex-1 text-sm text-slate-600 dark:text-slate-300">
+        <div className="relative mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
+          <h1 className="text-base font-semibold tracking-wide sm:text-lg">
+            OvenAI
+          </h1>
+          <p className="hidden flex-1 text-sm text-slate-600 sm:block dark:text-slate-300">
             AI로 비디오 광고를 쉽고 빠르게 만들어보세요.
           </p>
-          <div className="absolute right-6 top-4">
+          <div className="ml-auto">
             <ThemeToggle />
           </div>
         </div>
       </div>
-      <div className="mx-auto flex w-full max-w-7xl flex-col-reverse gap-6 px-6 pb-10 pt-6 md:py-10 lg:flex-row">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 pb-6 pt-4 sm:px-6 lg:flex-row lg:gap-6 lg:pb-10 lg:pt-6">
         <ChatKitPanel
-          className="relative w-full md:w-[35%] h-[calc(90vh-100px)] overflow-hidden rounded-3xl bg-white/80 shadow-[0_45px_90px_-45px_rgba(15,23,42,0.6)] ring-1 ring-slate-200/60 backdrop-blur md:h-[calc(90vh-100px)] dark:bg-slate-900/70 dark:shadow-[0_45px_90px_-45px_rgba(15,23,42,0.85)] dark:ring-slate-800/60"
+          className="relative h-[60vh] w-full shrink-0 overflow-hidden rounded-2xl bg-white/80 shadow-lg ring-1 ring-slate-200/60 backdrop-blur sm:rounded-3xl lg:h-[calc(100vh-140px)] lg:w-[380px] xl:w-[420px] dark:bg-slate-900/70 dark:ring-slate-800/60"
           onChatKitReady={(chatkit) => (chatkitRef.current = chatkit)}
         />
         <StoryboardPanel
-          className="relative flex-1 w-full md:w-[65%] h-[calc(90vh-100px)] overflow-hidden rounded-3xl bg-white/80 shadow-[0_45px_90px_-45px_rgba(15,23,42,0.6)] ring-1 ring-slate-200/60 backdrop-blur md:h-[calc(90vh-100px)] dark:bg-slate-900/70 dark:shadow-[0_45px_90px_-45px_rgba(15,23,42,0.85)] dark:ring-slate-800/60"
+          className="relative min-h-[400px] w-full flex-1 overflow-hidden rounded-2xl bg-white/80 shadow-lg ring-1 ring-slate-200/60 backdrop-blur sm:rounded-3xl lg:h-[calc(100vh-140px)] lg:min-h-0 dark:bg-slate-900/70 dark:ring-slate-800/60"
         />
       </div>
     </div>
